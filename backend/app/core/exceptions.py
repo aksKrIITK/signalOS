@@ -59,3 +59,40 @@ class RateLimitError(AppError):
 class SecurityError(AppError):
     def __init__(self, message: str = "Security policy violation", details: Optional[Dict[str, Any]] = None):
         super().__init__(code="SECURITY_VIOLATION", message=message, status_code=400, details=details)
+
+
+# Queue & Retry System Exceptions
+class QueueError(AppError):
+    """Base exception for message queue & retry pipeline operations."""
+    def __init__(self, code: str = "QUEUE_ERROR", message: str = "Queue operation failed", status_code: int = 500, details: Optional[Dict[str, Any]] = None):
+        super().__init__(code=code, message=message, status_code=status_code, details=details)
+
+
+class MessageBrokerConnectionError(QueueError):
+    def __init__(self, message: str = "Failed to connect to message broker", details: Optional[Dict[str, Any]] = None):
+        super().__init__(code="BROKER_CONNECTION_ERROR", message=message, status_code=503, details=details)
+
+
+class TransientQueueError(QueueError):
+    """Transient errors that are safe to retry with backoff (e.g. network timeout, rate limit, temp deadlock)."""
+    def __init__(self, message: str = "Transient queue error - retryable", details: Optional[Dict[str, Any]] = None):
+        super().__init__(code="TRANSIENT_QUEUE_ERROR", message=message, status_code=503, details=details)
+
+
+class NonTransientQueueError(QueueError):
+    """Fatal, non-retryable errors (e.g. corrupt payload, schema mismatch, unauthorized). Sent directly to DLQ."""
+    def __init__(self, message: str = "Fatal non-transient error - routed to DLQ", details: Optional[Dict[str, Any]] = None):
+        super().__init__(code="NON_TRANSIENT_QUEUE_ERROR", message=message, status_code=400, details=details)
+
+
+class MaxRetriesExceededError(QueueError):
+    """Raised when job retry count reaches MAX_RETRIES threshold."""
+    def __init__(self, message: str = "Max retries exceeded for job", details: Optional[Dict[str, Any]] = None):
+        super().__init__(code="MAX_RETRIES_EXCEEDED", message=message, status_code=500, details=details)
+
+
+class DLQRoutingError(QueueError):
+    """Raised when writing to Dead Letter Queue fails."""
+    def __init__(self, message: str = "Failed to route message to Dead Letter Queue", details: Optional[Dict[str, Any]] = None):
+        super().__init__(code="DLQ_ROUTING_ERROR", message=message, status_code=500, details=details)
+

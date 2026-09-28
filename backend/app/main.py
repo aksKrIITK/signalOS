@@ -27,6 +27,7 @@ from app.api.routes import (
     knowledge,
     metrics,
     health,
+    queues,
 )
 
 setup_logging(debug=settings.DEBUG)
@@ -258,3 +259,5 @@ app.include_router(agent_runs.router, prefix=settings.API_V1_STR)
 app.include_router(approvals.router, prefix=settings.API_V1_STR)
 app.include_router(knowledge.router, prefix=settings.API_V1_STR)
 app.include_router(metrics.router, prefix=settings.API_V1_STR)
+app.include_router(queues.router, prefix=settings.API_V1_STR)
+
