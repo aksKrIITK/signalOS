@@ -54,10 +54,13 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: Optional[str] = None
     ANTHROPIC_API_KEY: Optional[str] = None
     GEMINI_API_KEY: Optional[str] = None
+    COHERE_API_KEY: Optional[str] = None
 
     DEFAULT_LLM_PROVIDER: str = "openai"
     DEFAULT_FAST_MODEL: str = "gpt-4o-mini"
     DEFAULT_REASONING_MODEL: str = "gpt-4o"
+    DEFAULT_EMBEDDING_MODEL: str = "text-embedding-3-small"
+    DEFAULT_RERANK_MODEL: str = "rerank-english-v3.0"
 
     # Agent Loop Guardrails
     MAX_AGENT_STEPS: int = 15
@@ -76,6 +79,21 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5173",
         "http://localhost:8000",
     ]
+
+    # Message Queue & Kafka Architecture
+    QUEUE_BACKEND: str = "redis"  # "kafka", "redis", "memory"
+    KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9092"
+    KAFKA_CONSUMER_GROUP: str = "signalos-workers"
+    KAFKA_CLIENT_ID: str = "signalos-producer"
+    KAFKA_AUTO_OFFSET_RESET: str = "earliest"
+
+    # Distributed Retry & DLQ Configuration
+    MAX_JOB_RETRIES: int = 3
+    RETRY_INITIAL_DELAY_SECONDS: float = 1.0
+    RETRY_MAX_DELAY_SECONDS: float = 60.0
+    RETRY_BACKOFF_FACTOR: float = 2.0
+    RETRY_JITTER: bool = True
+    DLQ_ENABLED: bool = True
 
     model_config = SettingsConfigDict(
         env_file=".env",
