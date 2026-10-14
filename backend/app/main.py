@@ -188,6 +188,10 @@ async def seed_initial_data():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+    FastAPI lifespan context manager for startup and shutdown events.
+    Creates database schema tables if they do not exist and populates initial demo data.
+    """
     # Initialize tables if needed
     try:
         async with engine.begin() as conn:
@@ -219,6 +223,11 @@ app.add_middleware(
 # Correlation Tracing Middleware
 @app.middleware("http")
 async def correlation_id_middleware(request: Request, call_next):
+    """
+    HTTP middleware for request correlation tracing and latency tracking.
+    Extracts or generates an X-Request-ID, binds it to structlog contextvars,
+    measures request latency, and adds correlation headers to the HTTP response.
+    """
     request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
     structlog.contextvars.clear_contextvars()
     structlog.contextvars.bind_contextvars(request_id=request_id)
@@ -235,6 +244,11 @@ async def correlation_id_middleware(request: Request, call_next):
 # Centralized Exception Handler
 @app.exception_handler(AppError)
 async def app_exception_handler(request: Request, exc: AppError):
+    """
+    Global exception handler for application-specific AppError instances.
+    Transforms domain errors into standardized JSON responses with error code,
+    message, context details, and correlation request_id.
+    """
     request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
     return JSONResponse(
         status_code=exc.status_code,

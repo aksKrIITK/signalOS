@@ -19,6 +19,10 @@ class UserRole(str, Enum):
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """
+    Verifies a plaintext password against a stored bcrypt hash.
+    Safely handles bcrypt's 72-byte limit and falls back to passlib context if needed.
+    """
     try:
         return bcrypt.checkpw(plain_password.encode('utf-8')[:72], hashed_password.encode('utf-8'))
     except Exception:
@@ -26,6 +30,10 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 def get_password_hash(password: str) -> str:
+    """
+    Computes a secure bcrypt hash with a randomly generated salt for the given password.
+    Truncates to 72 bytes to respect bcrypt specifications.
+    """
     salt = bcrypt.gensalt()
     return bcrypt.hashpw(password.encode('utf-8')[:72], salt).decode('utf-8')
 
@@ -37,6 +45,10 @@ def create_access_token(
     expires_delta: Optional[timedelta] = None,
     extra_claims: Optional[Dict[str, Any]] = None,
 ) -> str:
+    """
+    Generates a cryptographically signed JWT access token for authentication.
+    Encodes subject (user_id), organization_id, tenant role, issue time, and expiration time.
+    """
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
@@ -56,4 +68,8 @@ def create_access_token(
 
 
 def decode_access_token(token: str) -> Dict[str, Any]:
+    """
+    Decodes and validates a signed JWT token against the application's secret key and algorithm.
+    Returns the claims payload dictionary or raises an exception if the signature or expiration is invalid.
+    """
     return jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
