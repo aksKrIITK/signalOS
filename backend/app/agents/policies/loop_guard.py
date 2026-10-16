@@ -15,6 +15,10 @@ def check_agent_limits(
     max_tool_calls: int = settings.MAX_TOOL_CALLS,
     max_cost_usd: float = settings.MAX_COST_USD,
 ) -> None:
+    """
+    Enforces computational safety policies and budget guardrails for autonomous agent runs.
+    Raises LimitExceededError if step count, tool call volume, or accrued cost exceeds configured ceilings.
+    """
     if step_count > max_steps:
         raise LimitExceededError(f"Agent exceeded maximum step limit ({step_count}/{max_steps})")
     if tool_call_count > max_tool_calls:

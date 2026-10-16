@@ -16,6 +16,10 @@ async def get_current_user(
     auth: Optional[HTTPAuthorizationCredentials] = Depends(security_scheme),
     db: AsyncSession = Depends(get_db),
 ) -> User:
+    """
+    FastAPI dependency that extracts and validates the JWT bearer token from the request header.
+    Resolves the user from the database; falls back to the demo user in local development if unauthenticated.
+    """
     if not auth or not auth.credentials:
         # For development / initial access, create or return demo user
         user_repo = UserRepository(db)
@@ -49,7 +53,12 @@ async def get_current_user(
 
 
 def require_roles(allowed_roles: List[str]) -> Callable:
+    """
+    Factory creating a dependency that enforces RBAC (Role-Based Access Control).
+    Ensures the authenticated user possesses at least one of the specified allowed roles.
+    """
     async def _role_checker(current_user: User = Depends(get_current_user)) -> User:
+        """Verifies current user's role against allowed roles, raising ForbiddenError if unauthorized."""
         if current_user.role not in allowed_roles:
             raise ForbiddenError(f"User role '{current_user.role}' is not authorized for this resource")
         return current_user

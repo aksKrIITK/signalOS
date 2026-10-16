@@ -16,18 +16,32 @@ from app.agents.nodes.execution_node import execution_node
 
 
 def route_critic(state: SDRState) -> Literal["research", "approval"]:
+    """
+    Evaluates the critic node outcome.
+    Routes back to 'research' if quality audits fail and maximum iteration threshold has not been reached;
+    otherwise advances to 'approval'.
+    """
     if not state.get("critic_passed", True) and state.get("research_iterations", 0) < 2:
         return "research"
     return "approval"
 
 
 def route_approval(state: SDRState) -> Literal["execution", "end"]:
+    """
+    Evaluates human-in-the-loop approval status.
+    Routes to 'execution' if approved; halts and branches to 'end' if pending or rejected.
+    """
     if state.get("approved", False):
         return "execution"
     return "end"
 
 
 def build_sdr_graph():
+    """
+    Constructs and compiles the multi-step LangGraph StateGraph for autonomous SDR operations.
+    Connects planner, discovery, research, signal detection, RAG retrieval, lead scoring,
+    personalization, critic audit, human approval gate, and external execution nodes.
+    """
     builder = StateGraph(SDRState)
 
     # Register Nodes
