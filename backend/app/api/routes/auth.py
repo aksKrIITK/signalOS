@@ -13,6 +13,10 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
 async def register(data: UserRegisterRequest, db: AsyncSession = Depends(get_db)):
+    """
+    Registers a new tenant organization and primary administrative user.
+    Hashes the user password, commits transactional records, and issues a JWT bearer token.
+    """
     org_repo = OrganizationRepository(db)
     user_repo = UserRepository(db)
 
@@ -46,6 +50,10 @@ async def register(data: UserRegisterRequest, db: AsyncSession = Depends(get_db)
 
 @router.post("/login", response_model=Token)
 async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
+    """
+    Authenticates an existing user via email and password credentials.
+    Verifies bcrypt hash and returns a signed JWT access token with tenant context.
+    """
     user_repo = UserRepository(db)
     user = await user_repo.get_by_email(data.email)
     if not user or not verify_password(data.password, user.hashed_password):
@@ -67,4 +75,7 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
 
 @router.get("/me", response_model=UserResponse)
 async def get_me(current_user: User = Depends(get_current_user)):
+    """
+    Retrieves the currently authenticated user's profile and organization context.
+    """
     return current_user

@@ -18,6 +18,10 @@ async def list_pending_approvals(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Lists all agent runs currently paused in the WAITING_APPROVAL state
+    requiring human operator review and sign-off before executing outreach.
+    """
     repo = AgentRunRepository(db)
     return await repo.list_runs(
         organization_id=current_user.organization_id,
@@ -32,6 +36,11 @@ async def approve_agent_action(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Approves an agent-generated outreach draft with optional subject/body modifications.
+    Executes the outreach action via ActionService with idempotency guarantees,
+    and marks the agent run as COMPLETED.
+    """
     run_repo = AgentRunRepository(db)
     run = await run_repo.get_by_id(id, current_user.organization_id)
     if not run:
@@ -72,6 +81,10 @@ async def reject_agent_action(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Rejects the proposed agent outreach action, recording human operator feedback
+    and setting the run status to REJECTED to prevent delivery.
+    """
     run_repo = AgentRunRepository(db)
     run = await run_repo.get_by_id(id, current_user.organization_id)
     if not run:

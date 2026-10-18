@@ -25,6 +25,10 @@ async def create_campaign(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Creates a new GTM campaign for the tenant organization,
+    initializing ICP definitions, signal rules, and scheduling constraints.
+    """
     service = CampaignService(db)
     campaign = await service.create_campaign(current_user.organization_id, data)
     await db.commit()
@@ -38,6 +42,9 @@ async def list_campaigns(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Lists campaigns belonging to the authenticated user's organization with pagination.
+    """
     service = CampaignService(db)
     campaigns = await service.list_campaigns(current_user.organization_id, skip=skip, limit=limit)
     return campaigns
@@ -49,6 +56,9 @@ async def get_campaign(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Retrieves full details of a single campaign by ID within the tenant organization.
+    """
     service = CampaignService(db)
     return await service.get_campaign(id, current_user.organization_id)
 
@@ -60,6 +70,9 @@ async def update_campaign(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Updates mutable campaign attributes such as name, description, ICP parameters, or status.
+    """
     service = CampaignService(db)
     updated = await service.update_campaign(id, current_user.organization_id, data)
     await db.commit()
@@ -73,6 +86,10 @@ async def run_campaign(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Triggers batch execution of the campaign against candidate leads.
+    Queues asynchronous worker tasks to process leads via autonomous SDR agents.
+    """
     service = CampaignService(db)
     campaign = await service.get_campaign(id, current_user.organization_id)
     job_id = f"job-camp-{uuid.uuid4().hex[:8]}"
@@ -97,6 +114,9 @@ async def pause_campaign(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Pauses an actively running campaign, halting further agent runs until resumed.
+    """
     service = CampaignService(db)
     updated = await service.update_campaign(
         id, current_user.organization_id, CampaignUpdate(status="PAUSED")
@@ -111,6 +131,10 @@ async def get_campaign_progress(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Computes real-time progress statistics for a campaign, including total leads,
+    processed count, qualified rates, and pending approvals.
+    """
     service = CampaignService(db)
     progress = await service.get_progress(id, current_user.organization_id)
     return CampaignProgressResponse(**progress)
