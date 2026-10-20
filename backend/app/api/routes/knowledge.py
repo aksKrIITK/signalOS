@@ -24,6 +24,11 @@ async def upload_document(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Ingests a knowledge base document into the organization repository.
+    Splits document text into chunks, generates vector embeddings, and stores
+    them for downstream RAG retrieval by SDR agents.
+    """
     repo = KnowledgeRepository(db)
     doc = await repo.create(
         organization_id=current_user.organization_id,
@@ -55,6 +60,10 @@ async def search_knowledge(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Performs semantic vector search across organizational knowledge chunks.
+    Embeds the user search query and returns the top-K relevant text passages with similarity scores.
+    """
     repo = KnowledgeRepository(db)
     query_emb = embedding_service.generate_embedding(data.query)
 

@@ -24,6 +24,10 @@ async def list_agent_runs(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Lists autonomous agent execution runs for the organization,
+    filterable by campaign ID and run status (e.g. WAITING_APPROVAL, RUNNING, COMPLETED).
+    """
     repo = AgentRunRepository(db)
     runs = await repo.list_runs(
         organization_id=current_user.organization_id,
@@ -41,6 +45,10 @@ async def get_agent_run(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Retrieves full execution telemetry for an agent run,
+    including token usage, cost, generated output, and sequential tool invocation logs.
+    """
     repo = AgentRunRepository(db)
     run = await repo.get_with_tools(id, current_user.organization_id)
     if not run:
@@ -54,6 +62,9 @@ async def cancel_agent_run(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Cancels an active or queued agent run, updating its status to CANCELLED.
+    """
     repo = AgentRunRepository(db)
     run = await repo.get_by_id(id, current_user.organization_id)
     if not run:
@@ -75,6 +86,7 @@ async def stream_agent_trace(
     channel = f"stream:run:{str(id)}"
 
     async def event_generator() -> AsyncGenerator[str, None]:
+        """Asynchronously streams trace events from Redis pub/sub or simulated execution progression."""
         # Initial connect event
         yield f"event: connect\ndata: {json.dumps({'run_id': str(id), 'status': 'connected'})}\n\n"
 
