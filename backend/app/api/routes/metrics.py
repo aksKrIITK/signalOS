@@ -17,6 +17,11 @@ async def get_dashboard_metrics(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> Dict[str, Any]:
+    """
+    Computes high-level KPI metrics for the executive dashboard.
+    Aggregates active campaigns, leads volume, qualification ratios, agent run success rates,
+    total LLM token consumption, and accrued operational cost in USD.
+    """
     org_id = current_user.organization_id
 
     # Count campaigns

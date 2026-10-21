@@ -23,7 +23,10 @@ class PurgeResponse(BaseModel):
 
 @router.get("/status")
 async def get_queue_status(current_user=Depends(get_current_active_user)):
-    """Returns messaging queue configuration and active bus status."""
+    """
+    Returns messaging queue system configuration and active message bus operational status,
+    including backend type (memory/redis/kafka), retry constraints, and DLQ flags.
+    """
     return {
         "backend": settings.QUEUE_BACKEND,
         "kafka_bootstrap": settings.KAFKA_BOOTSTRAP_SERVERS,
@@ -41,7 +44,10 @@ async def get_job_retry_state(
     job_id: str,
     current_user=Depends(get_current_active_user),
 ):
-    """Retrieves detailed retry tracking state, attempt logs, and execution history for a job ID."""
+    """
+    Retrieves detailed retry tracking state, attempt logs, and execution history for a given job ID.
+    Raises 404 NOT_FOUND if no tracking record exists for the provided job.
+    """
     state = await message_bus.retry_tracker.get_job_state(job_id)
     if not state:
         raise HTTPException(
@@ -57,7 +63,10 @@ async def list_dlq_messages(
     limit: int = Query(50, ge=1, le=500),
     current_user=Depends(get_current_active_user),
 ):
-    """Lists unrecoverable failed messages stored in the Dead Letter Queue (DLQ)."""
+    """
+    Lists unrecoverable failed messages stored in the Dead Letter Queue (DLQ),
+    filterable by source topic with pagination limit.
+    """
     return await message_bus.dlq.list_dlq_items(topic=topic, limit=limit)
 
 
@@ -66,7 +75,10 @@ async def replay_dlq_message(
     dlq_id: str,
     current_user=Depends(get_current_active_user),
 ):
-    """Replays a Dead Letter Queue item back onto its original topic for re-execution."""
+    """
+    Replays a Dead Letter Queue item back onto its original topic for re-execution.
+    Resets the attempt counter and republishes the payload to the message broker.
+    """
     msg = await message_bus.dlq.replay_dlq_item(dlq_id, message_bus.producer)
     if not msg:
         raise HTTPException(
@@ -86,6 +98,9 @@ async def purge_dlq_messages(
     topic: Optional[str] = Query(None, description="Topic to purge from DLQ (purges all if omitted)"),
     current_user=Depends(get_current_active_user),
 ):
-    """Purges items from the Dead Letter Queue."""
+    """
+    Purges items from the Dead Letter Queue, either across a specific topic or entirely.
+    Returns the total count of purged records.
+    """
     count = await message_bus.dlq.purge(topic=topic)
     return PurgeResponse(purged_count=count, topic=topic)

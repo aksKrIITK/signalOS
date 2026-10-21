@@ -20,6 +20,10 @@ async def list_leads(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Lists leads for the current tenant organization with optional status filtering,
+    qualification score threshold, and pagination.
+    """
     service = LeadService(db)
     return await service.list_leads(
         organization_id=current_user.organization_id,
@@ -36,6 +40,10 @@ async def get_lead(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Fetches full lead profile by ID, including company details, contact information,
+    and ICP qualification breakdown.
+    """
     service = LeadService(db)
     return await service.get_lead(id, current_user.organization_id)
 
@@ -47,6 +55,9 @@ async def update_lead(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Updates the lifecycle status or score of a specific lead record.
+    """
     service = LeadService(db)
     updated = await service.update_lead_status(
         id, current_user.organization_id, status=data.status or "RESEARCHING", score=data.score

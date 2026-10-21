@@ -16,6 +16,10 @@ async def get_current_organization(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> Dict[str, Any]:
+    """
+    Retrieves the tenant organization of the currently authenticated user,
+    including metadata and list of associated team members.
+    """
     org_repo = OrganizationRepository(db)
     user_repo = UserRepository(db)
 
@@ -41,6 +45,10 @@ async def get_organization_by_id(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Fetches details of a specific organization by its unique UUID.
+    Restricts access to members belonging to that organization or system owners.
+    """
     if current_user.organization_id != id and current_user.role != UserRole.OWNER:
         raise HTTPException(status_code=403, detail="Not authorized to access this organization")
 
