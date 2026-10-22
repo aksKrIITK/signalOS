@@ -4,6 +4,10 @@ import structlog
 
 
 def setup_logging(debug: bool = True):
+    """
+    Configures structured logging for SignalOS using structlog and standard logging.
+    In debug mode, uses colorized console output; in production, outputs structured JSON format.
+    """
     shared_processors = [
         structlog.contextvars.merge_contextvars,
         structlog.stdlib.add_logger_name,

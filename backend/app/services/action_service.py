@@ -7,7 +7,10 @@ from app.core.logging import logger
 
 
 class ActionService:
+    """Service layer executing real-world side effects (email outreach, CRM logging) with strict idempotency."""
+
     def __init__(self, db: AsyncSession):
+        """Initializes ActionService with database session, execution tracker, and audit log repository."""
         self.db = db
         self.action_repo = ActionExecutionRepository(db)
         self.audit_repo = AuditLogRepository(db)
@@ -22,8 +25,9 @@ class ActionService:
         user_id: Optional[uuid.UUID] = None,
     ) -> Dict[str, Any]:
         """
-        Executes external side effects (send_email, crm_update) with guaranteed idempotency.
-        Key pattern: `campaign_id:lead_id:action_type`
+        Executes external side effects (e.g. send_email, create_crm_activity) with guaranteed idempotency.
+        Key pattern: `campaign_id:lead_id:action_type`. Prevents duplicate outbound communications
+        and records every event in the immutable audit log.
         """
         idempotency_key = f"{str(campaign_id)}:{str(lead_id)}:{action_type}"
 

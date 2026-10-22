@@ -23,6 +23,11 @@ Base = declarative_base()
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """
+    FastAPI dependency yielding an asynchronous SQLAlchemy database session.
+    Commits changes automatically upon successful execution, rolls back on exceptions,
+    and closes the session during cleanup.
+    """
     async with AsyncSessionLocal() as session:
         try:
             yield session
