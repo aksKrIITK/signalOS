@@ -29,12 +29,17 @@ class EmbeddingService:
         model_name: Optional[str] = None,
         cache_size: int = 4096,
     ):
+        """
+        Initializes the EmbeddingService with vector dimensionality, model identifier,
+        and bounded in-memory LRU embedding cache.
+        """
         self.dimension = dimension
         self.model_name = model_name or settings.DEFAULT_EMBEDDING_MODEL
         self._cache: Dict[str, List[float]] = {}
         self._cache_size = cache_size
 
     def _get_cache_key(self, text: str) -> str:
+        """Computes SHA-256 hash digest of trimmed text string for cache indexing."""
         return hashlib.sha256(text.strip().encode("utf-8")).hexdigest()
 
     def chunk_text(
@@ -57,6 +62,7 @@ class EmbeddingService:
         separators = ["\n# ", "\n## ", "\n### ", "\n\n", "\n", ". ", "? ", "! ", " "]
 
         def _split_text(content: str, current_separators: List[str]) -> List[str]:
+            """Recursively breaks text down through separator hierarchy until chunk size constraint is satisfied."""
             if not current_separators or len(content.split()) <= chunk_size:
                 return [content] if content.strip() else []
 

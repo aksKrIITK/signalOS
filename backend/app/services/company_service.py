@@ -8,7 +8,10 @@ from app.schemas.company import CompanyCreate, ContactCreate
 
 
 class CompanyService:
+    """Service layer managing company and contact identity resolution, deduplication, and enrichment."""
+
     def __init__(self, db: AsyncSession):
+        """Initializes CompanyService with database session and corresponding repositories."""
         self.db = db
         self.comp_repo = CompanyRepository(db)
         self.cont_repo = ContactRepository(db)
@@ -18,6 +21,10 @@ class CompanyService:
         organization_id: uuid.UUID,
         company_data: CompanyCreate,
     ) -> Company:
+        """
+        Deduplicates companies by domain within an organization.
+        Enriches missing fields on existing companies or inserts a new company record.
+        """
         existing = await self.comp_repo.get_by_domain(organization_id, company_data.domain)
         if existing:
             # Enrich existing company if new data available
@@ -49,6 +56,10 @@ class CompanyService:
         company_id: uuid.UUID,
         contact_data: ContactCreate,
     ) -> Contact:
+        """
+        Deduplicates contacts by email address within the tenant organization.
+        Creates a new contact record associated with the target company if absent.
+        """
         if contact_data.email:
             existing = await self.cont_repo.get_by_email(organization_id, contact_data.email)
             if existing:
