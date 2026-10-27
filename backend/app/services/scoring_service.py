@@ -21,6 +21,11 @@ class LeadScoringEngine:
         detected_signals: List[Dict[str, Any]],
         icp: Dict[str, Any],
     ) -> LeadScoreBreakdown:
+        """
+        Calculates a deterministic and qualitative qualification score (0-100) for a lead.
+        Evaluates company profile against ICP rules, persona seniority, verified buying signals,
+        and data completeness to produce an explainable LeadScoreBreakdown.
+        """
         reasons: List[str] = []
         det_scores: Dict[str, float] = {}
         qual_scores: Dict[str, float] = {}

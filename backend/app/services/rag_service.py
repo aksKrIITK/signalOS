@@ -25,6 +25,7 @@ class RagPipelineService:
     """
 
     def __init__(self, db: AsyncSession):
+        """Initializes the RAG pipeline service with database session, knowledge repository, and LLM client."""
         self.db = db
         self.knowledge_repo = KnowledgeRepository(db)
         self.llm_provider = OpenAIProvider()

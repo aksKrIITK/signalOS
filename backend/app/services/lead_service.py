@@ -8,7 +8,10 @@ from app.core.exceptions import NotFoundError
 
 
 class LeadService:
+    """Service layer managing business logic, qualification scoring, and lifecycle for sales leads."""
+
     def __init__(self, db: AsyncSession):
+        """Initializes LeadService with a database session and lead repository."""
         self.db = db
         self.lead_repo = LeadRepository(db)
 
@@ -22,6 +25,10 @@ class LeadService:
         score_reason: Optional[Dict[str, Any]] = None,
         source: str = "agent_discovery",
     ) -> Lead:
+        """
+        Upserts a lead record. If an existing lead matches the organization, company,
+        and contact, updates its status and score; otherwise creates a new lead.
+        """
         existing = await self.lead_repo.get_by_company_and_contact(organization_id, company_id, contact_id)
         if existing:
             return await self.lead_repo.update(
@@ -42,6 +49,9 @@ class LeadService:
         )
 
     async def get_lead(self, id: uuid.UUID, organization_id: uuid.UUID) -> Lead:
+        """
+        Retrieves a lead by ID with company and contact relationships, raising NotFoundError if missing.
+        """
         lead = await self.lead_repo.get_with_details(id, organization_id)
         if not lead:
             raise NotFoundError(f"Lead {id} not found")
@@ -55,6 +65,9 @@ class LeadService:
         skip: int = 0,
         limit: int = 50,
     ) -> Sequence[Lead]:
+        """
+        Retrieves filtered leads for an organization, matching status, min score, and pagination limits.
+        """
         return await self.lead_repo.list_leads(
             organization_id=organization_id,
             status=status,
@@ -70,5 +83,8 @@ class LeadService:
         status: str,
         score: Optional[float] = None,
     ) -> Lead:
+        """
+        Updates the status and optional qualification score of an identified lead.
+        """
         lead = await self.get_lead(id, organization_id)
         return await self.lead_repo.update(lead, status=status, score=score)
