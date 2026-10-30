@@ -3,6 +3,16 @@ from app.agents.state import SDRState
 
 
 async def approval_node(state: SDRState) -> Dict[str, Any]:
+    """
+    Evaluates whether the generated outreach action requires human intervention.
+
+    Args:
+        state (SDRState): Current execution state of the SDR agent pipeline.
+
+    Returns:
+        Dict[str, Any]: State updates containing incremented step count and
+            a boolean flag indicating if human approval is required.
+    """
     step_count = state.get("step_count", 0) + 1
     # Check if human has already granted approval
     approved = state.get("approved", False)
@@ -14,6 +24,16 @@ async def approval_node(state: SDRState) -> Dict[str, Any]:
 
 
 async def execution_node(state: SDRState) -> Dict[str, Any]:
+    """
+    Executes approved outreach actions (e.g., dispatching email) for the target lead.
+
+    Args:
+        state (SDRState): Current state containing contact details, target company,
+            and approved email copy.
+
+    Returns:
+        Dict[str, Any]: Updated state with execution status and action results.
+    """
     step_count = state.get("step_count", 0) + 1
     company = state.get("company", {})
     contact = state.get("contact", {})

@@ -4,6 +4,19 @@ from app.agents.tools.registry import get_tool
 
 
 async def contact_discovery_node(state: SDRState) -> Dict[str, Any]:
+    """
+    Discovers key decision-makers and buyer personas within the target account.
+
+    Uses internal contact directory or CRM search to look up executive profiles
+    (such as CTO or VP Engineering) matching the target persona criteria.
+
+    Args:
+        state (SDRState): Current execution state containing company context.
+
+    Returns:
+        Dict[str, Any]: State dictionary update containing contact details,
+            recorded tool calls, and updated step count.
+    """
     contact = state.get("contact", {})
     step_count = state.get("step_count", 0) + 1
     tool_calls = list(state.get("tool_calls", []))

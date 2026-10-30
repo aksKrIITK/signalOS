@@ -4,6 +4,19 @@ from app.agents.tools.registry import get_tool
 
 
 async def company_discovery_node(state: SDRState) -> Dict[str, Any]:
+    """
+    Identifies target accounts fitting the campaign's Ideal Customer Profile (ICP).
+
+    Performs web discovery search queries if target company details are not yet
+    present in the state, populating firmographic information.
+
+    Args:
+        state (SDRState): Current execution state containing ICP rules and company info.
+
+    Returns:
+        Dict[str, Any]: State dictionary update with discovered company attributes,
+            recorded tool calls, and updated step count.
+    """
     company = state.get("company", {})
     tool_calls = list(state.get("tool_calls", []))
     step_count = state.get("step_count", 0) + 1
