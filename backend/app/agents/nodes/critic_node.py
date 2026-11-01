@@ -7,12 +7,32 @@ from app.llm.router import model_router
 
 
 class CriticEvaluation(BaseModel):
+    """
+    Structured outcome of the hallucination audit and claim verification check.
+
+    Attributes:
+        passed (bool): Indicates if the drafted email passed all grounding criteria.
+        groundedness_score (float): Confidence score (0.0 - 1.0) of factual grounding.
+        feedback (str): Constructive audit notes or explanation of discrepancies.
+    """
     passed: bool = True
     groundedness_score: float = 0.95
     feedback: str = "Email copy is fully grounded in verified signals with valid citations."
 
 
 async def critic_node(state: SDRState) -> Dict[str, Any]:
+    """
+    Audits drafted copy against verified signals and dossier evidence to prevent hallucination.
+
+    Invokes an LLM-based fact-checker evaluating groundedness, forcing a pass
+    if the maximum allowed research iteration threshold has been reached.
+
+    Args:
+        state (SDRState): Current execution state containing email draft, signals, and research.
+
+    Returns:
+        Dict[str, Any]: State updates with critic evaluation result, token usage, and cost.
+    """
     step_count = state.get("step_count", 0) + 1
     research_iterations = state.get("research_iterations", 1)
 
