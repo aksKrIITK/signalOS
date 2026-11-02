@@ -8,6 +8,19 @@ from app.schemas.agent import ResearchPlan
 
 
 async def planner_node(state: SDRState) -> Dict[str, Any]:
+    """
+    Formulates a targeted account research strategy based on ICP definitions and lead state.
+
+    Enforces loop guards and budget safety policies before executing LLM reasoning
+    to generate an actionable multi-step research plan.
+
+    Args:
+        state (SDRState): Current execution state with campaign ICP and target profile.
+
+    Returns:
+        Dict[str, Any]: Updated state containing the structured research plan,
+            accrued token counts, and cost increments.
+    """
     step_count = state.get("step_count", 0) + 1
     total_cost = state.get("total_cost_usd", 0.0)
     tool_calls = state.get("tool_calls", [])

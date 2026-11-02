@@ -7,6 +7,20 @@ from app.schemas.agent import PersonalizedEmail
 
 
 async def personalization_node(state: SDRState) -> Dict[str, Any]:
+    """
+    Synthesizes tailored email copy grounded in verified signals and company dossier.
+
+    Calls the LLM router to generate structured email subjects, bodies, and evidence claims
+    linking specific buying signals to the solution's value proposition.
+
+    Args:
+        state (SDRState): Current execution state containing discovered signals,
+            retrieved internal context, and contact persona.
+
+    Returns:
+        Dict[str, Any]: Updated state containing email subject, body, evidence citations,
+            and accrued LLM token usage and cost.
+    """
     step_count = state.get("step_count", 0) + 1
     company = state.get("company", {})
     contact = state.get("contact", {})
