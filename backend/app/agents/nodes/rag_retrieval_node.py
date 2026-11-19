@@ -5,6 +5,18 @@ from app.agents.tools.registry import get_tool
 
 
 async def rag_retrieval_node(state: SDRState) -> Dict[str, Any]:
+    """
+    Retrieves internal sales playbooks, objection handlers, and positioning collateral.
+
+    Queries the organization's vector store using semantic similarity matching
+    based on the target company's industry and detected buying signals.
+
+    Args:
+        state (SDRState): Current execution state with organization context, target company, and signals.
+
+    Returns:
+        Dict[str, Any]: Updated state containing retrieved context passages and tool call logs.
+    """
     step_count = state.get("step_count", 0) + 1
     org_id_str = state.get("organization_id", str(uuid.uuid4()))
     org_id = uuid.UUID(org_id_str) if isinstance(org_id_str, str) else org_id_str

@@ -3,6 +3,19 @@ from app.agents.state import SDRState
 
 
 async def signal_detection_node(state: SDRState) -> Dict[str, Any]:
+    """
+    Extracts high-intent buying signals from gathered research and web intelligence.
+
+    Detects trigger events such as recent funding rounds, engineering hiring surges,
+    and technological migrations with associated confidence scores and citations.
+
+    Args:
+        state (SDRState): Current execution state containing raw research documents.
+
+    Returns:
+        Dict[str, Any]: Updated state containing the list of verified buying signals
+            and incremented step count.
+    """
     research = state.get("research", [])
     step_count = state.get("step_count", 0) + 1
 

@@ -5,6 +5,19 @@ from app.core.logging import logger
 
 
 async def research_node(state: SDRState) -> Dict[str, Any]:
+    """
+    Conducts autonomous deep-dive web research and content extraction on target accounts.
+
+    Executes web searches for funding, technology adoption, and corporate announcements,
+    then securely extracts and sanitizes page text with SSRF validation.
+
+    Args:
+        state (SDRState): Current execution state with target company domain and history.
+
+    Returns:
+        Dict[str, Any]: Updated state containing extracted research items,
+            sequential tool invocations, and incremented iteration count.
+    """
     company = state.get("company", {})
     tool_calls = list(state.get("tool_calls", []))
     step_count = state.get("step_count", 0) + 1
