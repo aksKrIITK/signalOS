@@ -29,6 +29,21 @@ PROMPT_INJECTION_PATTERNS = [
 
 
 def validate_url_safety(url: str) -> bool:
+    """
+    Validates that a URL does not attempt Server-Side Request Forgery (SSRF).
+
+    Checks URL schemes, hostnames, and resolves DNS to prevent access to
+    loopback addresses, RFC 1918 private subnets, and cloud instance metadata services.
+
+    Args:
+        url (str): Target web URL to validate.
+
+    Returns:
+        bool: True if safe.
+
+    Raises:
+        SecurityError: If URL scheme or IP violates safety rules.
+    """
     parsed = urlparse(url)
     if parsed.scheme not in ["http", "https"]:
         raise SecurityError(f"Disallowed URL scheme: {parsed.scheme}")
@@ -54,6 +69,18 @@ def validate_url_safety(url: str) -> bool:
 
 
 def sanitize_untrusted_content(text: str) -> str:
+    """
+    Redacts prompt injection attack vectors from untrusted web page content.
+
+    Scans text for common jailbreak patterns, system prompt overrides, and
+    password extraction phrases, replacing them with redaction placeholders.
+
+    Args:
+        text (str): Raw extracted web page text.
+
+    Returns:
+        str: Sanitized text safe for inclusion in LLM prompt context.
+    """
     cleaned = text
     for pattern in PROMPT_INJECTION_PATTERNS:
         cleaned = pattern.sub("[POTENTIAL_PROMPT_INJECTION_REDACTED]", cleaned)
@@ -61,6 +88,16 @@ def sanitize_untrusted_content(text: str) -> str:
 
 
 class PageContent(BaseModel):
+    """
+    Structured representation of extracted and cleaned web page content.
+
+    Attributes:
+        url (str): Source web URL.
+        title (str): Extracted page title.
+        main_content (str): Sanitized primary text body.
+        links (list[str]): Discovered hyperlinks within the page.
+        metadata (dict): HTTP response metadata (status code, payload size).
+    """
     url: str
     title: str
     main_content: str
@@ -69,6 +106,20 @@ class PageContent(BaseModel):
 
 
 async def fetch_page(url: str, max_bytes: int = 500_000, timeout_seconds: float = 10.0) -> PageContent:
+    """
+    Safely retrieves and parses an external webpage for agent research.
+
+    Enforces SSRF validation, size quotas, boilerplate tag removal (scripts, styles,
+    navbars), and prompt-injection sanitization.
+
+    Args:
+        url (str): Webpage URL to scrape.
+        max_bytes (int): Maximum bytes to download before truncation. Defaults to 500,000.
+        timeout_seconds (float): Network request timeout in seconds. Defaults to 10.0.
+
+    Returns:
+        PageContent: Structured container with sanitized page text and metadata.
+    """
     validate_url_safety(url)
 
     headers = {

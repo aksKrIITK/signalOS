@@ -3,6 +3,8 @@ from app.core.exceptions import AppError
 
 
 class LimitExceededError(AppError):
+    """Raised when an autonomous agent run exceeds configured safety limits (steps, tool calls, or budget)."""
+
     def __init__(self, message: str):
         super().__init__(code="LIMIT_EXCEEDED", message=message, status_code=400)
 
