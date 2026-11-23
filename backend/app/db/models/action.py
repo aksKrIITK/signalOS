@@ -8,6 +8,12 @@ from app.db.models.base import UUIDMixin, TimestampMixin
 
 
 class ActionExecution(Base, UUIDMixin, TimestampMixin):
+    """
+    SQLAlchemy model recording outbound side-effect executions.
+
+    Enforces idempotency across asynchronous workers and approval actions,
+    preventing duplicate external API requests (e.g. emails or CRM mutations).
+    """
     __tablename__ = "action_executions"
 
     organization_id: Mapped[uuid.UUID] = mapped_column(

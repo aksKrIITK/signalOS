@@ -2,6 +2,8 @@ from typing import Any, Dict, Optional
 
 
 class AppError(Exception):
+    """Base application exception with machine-readable error codes and HTTP status code mappings."""
+
     def __init__(
         self,
         code: str,
@@ -17,46 +19,64 @@ class AppError(Exception):
 
 
 class NotFoundError(AppError):
+    """Raised when an entity, record, or resource does not exist in the tenant workspace."""
+
     def __init__(self, message: str = "Resource not found", details: Optional[Dict[str, Any]] = None):
         super().__init__(code="NOT_FOUND", message=message, status_code=404, details=details)
 
 
 class ValidationError(AppError):
+    """Raised when incoming user request payload or state fails domain validation rules."""
+
     def __init__(self, message: str = "Validation failed", details: Optional[Dict[str, Any]] = None):
         super().__init__(code="VALIDATION_ERROR", message=message, status_code=422, details=details)
 
 
 class UnauthorizedError(AppError):
+    """Raised when authentication credentials are missing, expired, or invalid."""
+
     def __init__(self, message: str = "Unauthorized", details: Optional[Dict[str, Any]] = None):
         super().__init__(code="UNAUTHORIZED", message=message, status_code=401, details=details)
 
 
 class ForbiddenError(AppError):
+    """Raised when authenticated user lacks permissions or roles to access a resource."""
+
     def __init__(self, message: str = "Forbidden", details: Optional[Dict[str, Any]] = None):
         super().__init__(code="FORBIDDEN", message=message, status_code=403, details=details)
 
 
 class ConflictError(AppError):
+    """Raised when a resource state conflict or unique constraint violation occurs."""
+
     def __init__(self, message: str = "Resource conflict", details: Optional[Dict[str, Any]] = None):
         super().__init__(code="CONFLICT", message=message, status_code=409, details=details)
 
 
 class ProviderError(AppError):
+    """Raised when an external LLM provider API fails or returns unexpected responses."""
+
     def __init__(self, message: str = "LLM provider error", details: Optional[Dict[str, Any]] = None):
         super().__init__(code="PROVIDER_ERROR", message=message, status_code=502, details=details)
 
 
 class ToolExecutionError(AppError):
+    """Raised when an agent tool invocation fails during pipeline runtime."""
+
     def __init__(self, message: str = "Tool execution failed", details: Optional[Dict[str, Any]] = None):
         super().__init__(code="TOOL_EXECUTION_ERROR", message=message, status_code=500, details=details)
 
 
 class RateLimitError(AppError):
+    """Raised when request volume exceeds defined quota limits or rate throttling gates."""
+
     def __init__(self, message: str = "Rate limit exceeded", details: Optional[Dict[str, Any]] = None):
         super().__init__(code="RATE_LIMIT_EXCEEDED", message=message, status_code=429, details=details)
 
 
 class SecurityError(AppError):
+    """Raised when an operation violates security policies, such as SSRF or prompt injection detection."""
+
     def __init__(self, message: str = "Security policy violation", details: Optional[Dict[str, Any]] = None):
         super().__init__(code="SECURITY_VIOLATION", message=message, status_code=400, details=details)
 
