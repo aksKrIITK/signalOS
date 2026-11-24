@@ -8,6 +8,9 @@ from app.db.models.base import UUIDMixin, TimestampMixin
 
 
 class AuditLog(Base, UUIDMixin, TimestampMixin):
+    """
+    SQLAlchemy model recording security, administrative, and data mutation audit trails.
+    """
     __tablename__ = "audit_logs"
 
     organization_id: Mapped[uuid.UUID] = mapped_column(

@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 
 
 class AgentRunStatus(str, Enum):
+    """Enumeration of possible execution lifecycle states for an autonomous agent run."""
     QUEUED = "QUEUED"
     RUNNING = "RUNNING"
     WAITING_APPROVAL = "WAITING_APPROVAL"
@@ -22,6 +23,9 @@ class AgentRunStatus(str, Enum):
 
 
 class AgentRun(Base, UUIDMixin, TimestampMixin):
+    """
+    SQLAlchemy model persisting execution state, token consumption, and output for an agent run.
+    """
     __tablename__ = "agent_runs"
 
     organization_id: Mapped[uuid.UUID] = mapped_column(
@@ -64,6 +68,9 @@ class AgentRun(Base, UUIDMixin, TimestampMixin):
 
 
 class ToolCall(Base, UUIDMixin, TimestampMixin):
+    """
+    SQLAlchemy model recording sequential tool invocations and latency metrics during an agent run.
+    """
     __tablename__ = "tool_calls"
 
     agent_run_id: Mapped[uuid.UUID] = mapped_column(

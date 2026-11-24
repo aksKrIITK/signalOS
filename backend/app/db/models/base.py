@@ -7,10 +7,13 @@ from app.db.database import Base
 
 
 def utc_now() -> datetime:
+    """Returns current timezone-aware UTC datetime."""
     return datetime.now(timezone.utc)
 
 
 class TimestampMixin:
+    """SQLAlchemy mixin providing standard created_at and updated_at timestamp columns."""
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=utc_now,
@@ -27,6 +30,8 @@ class TimestampMixin:
 
 
 class UUIDMixin:
+    """SQLAlchemy mixin configuring a primary key UUID with PostgreSQL gen_random_uuid() default."""
+
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         primary_key=True,
