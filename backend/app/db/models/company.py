@@ -13,6 +13,9 @@ if TYPE_CHECKING:
 
 
 class Company(Base, UUIDMixin, TimestampMixin):
+    """
+    SQLAlchemy model representing an account/organization profile with technographic metadata.
+    """
     __tablename__ = "companies"
 
     organization_id: Mapped[uuid.UUID] = mapped_column(

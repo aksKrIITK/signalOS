@@ -12,6 +12,9 @@ if TYPE_CHECKING:
 
 
 class Contact(Base, UUIDMixin, TimestampMixin):
+    """
+    SQLAlchemy model representing an individual prospect, executive, or decision maker.
+    """
     __tablename__ = "contacts"
 
     organization_id: Mapped[uuid.UUID] = mapped_column(

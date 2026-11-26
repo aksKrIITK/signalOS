@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 
 class CampaignStatus(str, Enum):
+    """Lifecycle statuses for a GTM outreach campaign."""
     DRAFT = "DRAFT"
     QUEUED = "QUEUED"
     RUNNING = "RUNNING"
@@ -23,6 +24,10 @@ class CampaignStatus(str, Enum):
 
 
 class Campaign(Base, UUIDMixin, TimestampMixin):
+    """
+    SQLAlchemy model representing an autonomous GTM campaign,
+    including ICP criteria, buying signal triggers, and lead associations.
+    """
     __tablename__ = "campaigns"
 
     organization_id: Mapped[uuid.UUID] = mapped_column(
@@ -43,6 +48,9 @@ class Campaign(Base, UUIDMixin, TimestampMixin):
 
 
 class CampaignLead(Base, UUIDMixin, TimestampMixin):
+    """
+    SQLAlchemy associative model linking leads to campaigns with individual progression status.
+    """
     __tablename__ = "campaign_leads"
 
     campaign_id: Mapped[uuid.UUID] = mapped_column(
