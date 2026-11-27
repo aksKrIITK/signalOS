@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 
 class LeadStatus(str, Enum):
+    """Lifecycle stages for prospective sales leads."""
     NEW = "NEW"
     RESEARCHING = "RESEARCHING"
     QUALIFIED = "QUALIFIED"
@@ -24,6 +25,9 @@ class LeadStatus(str, Enum):
 
 
 class Lead(Base, UUIDMixin, TimestampMixin):
+    """
+    SQLAlchemy model tracking sales lead qualification scores, lifecycle stage, and company/contact links.
+    """
     __tablename__ = "leads"
 
     organization_id: Mapped[uuid.UUID] = mapped_column(

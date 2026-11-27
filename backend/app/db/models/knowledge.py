@@ -9,6 +9,9 @@ from app.db.models.base import UUIDMixin, TimestampMixin
 
 
 class Document(Base, UUIDMixin, TimestampMixin):
+    """
+    SQLAlchemy model storing uploaded knowledge collateral, battlecards, and sales documentation.
+    """
     __tablename__ = "documents"
 
     organization_id: Mapped[uuid.UUID] = mapped_column(
@@ -26,6 +29,9 @@ class Document(Base, UUIDMixin, TimestampMixin):
 
 
 class KnowledgeChunk(Base, UUIDMixin, TimestampMixin):
+    """
+    SQLAlchemy model storing vectorized text passages with 1536-dimensional pgvector embeddings.
+    """
     __tablename__ = "knowledge_chunks"
 
     organization_id: Mapped[uuid.UUID] = mapped_column(

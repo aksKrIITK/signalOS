@@ -11,6 +11,9 @@ if TYPE_CHECKING:
 
 
 class Organization(Base, UUIDMixin, TimestampMixin):
+    """
+    SQLAlchemy model representing a multitenant customer account or organization workspace.
+    """
     __tablename__ = "organizations"
 
     name: Mapped[str] = mapped_column(String(255), nullable=False)
